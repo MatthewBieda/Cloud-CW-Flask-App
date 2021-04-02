@@ -20,15 +20,24 @@ def before_request():
 def index():
     if request.method == 'POST':
         year = request.form.get('year')
-        if year >='2005':
+        if year > '2005':
             data = requests.get(f"https://api.tfl.gov.uk/AccidentStats/{year}")
-            jsondata = data.json()
-            for line in jsondata: 
-                filter = ([line['id'], line['date'], line['borough']])
-                return json.dumps(filter)
+           # headers = {'with': 'mode, severity'}
+            jsondata = data.text
+            #return json.dumps(jsondata)
+        #return json.dumps(jsondata)
+            text_json = json.loads(jsondata)
+            for i in text_json:
+                return json.dumps(i["severity"])
+           #for line in jsondata:
+                #filter = (line["casualties"])
+                #return json.dumps(filter)
+            #return (mode["mode"])
+        #data = requests.get(f"https://api.tfl.gov.uk/AccidentStats/{year}")
+        #jsondata = data.json()
+        #return json.dumps(jsondata)
         else:
-            return "Please enter a year between 2005 and 2020"
-
+            print("Please enter a year between 2005 and 2020")
 
     if request.method == 'GET':
         user = {'username': 'Miguel'}
@@ -39,6 +48,7 @@ def index():
             }
         ]
         return render_template('index.html', title='Home', posts=posts)
+
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -98,7 +108,4 @@ def edit_profile():
         form.username.data = current_user.username
         form.about_me.data = current_user.about_me
     return render_template('edit_profile.html', title='Edit Profile', form=form)
-
-
-
 
