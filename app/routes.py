@@ -26,9 +26,14 @@ def index():
             jsondata = data.text
             #return json.dumps(jsondata)
         #return json.dumps(jsondata)
+            new = 0
+            old = []
             text_json = json.loads(jsondata)
             for i in text_json:
-                return json.dumps(i["severity"])
+                old.append(text_json[new]["borough"])
+                new = new + 1
+            return json.dumps(old)
+                #return json.dumps(i["severity"])
            #for line in jsondata:
                 #filter = (line["casualties"])
                 #return json.dumps(filter)
