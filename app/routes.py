@@ -8,6 +8,8 @@ from datetime import datetime
 import requests
 import json
 
+
+
 @app.before_request
 def before_request():
     if current_user.is_authenticated:
@@ -15,17 +17,14 @@ def before_request():
         db.session.commit()
 
 @app.route('/', methods=['GET', 'POST'])
-@app.route('/index', methods=['GET', 'POST'])
+@app.route('/home', methods=['GET', 'POST'])
 @login_required
-def index():
+def home():
     if request.method == 'POST':
         year = request.form.get('year')
         if year > '2005':
             data = requests.get(f"https://api.tfl.gov.uk/AccidentStats/{year}")
-           # headers = {'with': 'mode, severity'}
             jsondata = data.text
-            #return json.dumps(jsondata)
-        #return json.dumps(jsondata)
             new = 0
             old = []
             text_json = json.loads(jsondata)
@@ -33,14 +32,6 @@ def index():
                 old.append(text_json[new]["borough"])
                 new = new + 1
             return json.dumps(old)
-                #return json.dumps(i["severity"])
-           #for line in jsondata:
-                #filter = (line["casualties"])
-                #return json.dumps(filter)
-            #return (mode["mode"])
-        #data = requests.get(f"https://api.tfl.gov.uk/AccidentStats/{year}")
-        #jsondata = data.json()
-        #return json.dumps(jsondata)
         else:
             print("Please enter a year between 2005 and 2020")
 
@@ -52,14 +43,14 @@ def index():
                 'body': 'Which year\'s accident data would you like to view?:'
             }
         ]
-        return render_template('index.html', title='Home', posts=posts)
+        return render_template('home.html', title='Home', posts=posts)
 
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('home'))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
@@ -67,18 +58,18 @@ def login():
             flash('Invalid username or password')
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
-        return redirect(url_for('index'))
+        return redirect(url_for('home'))
     return render_template('login.html', title='Sign In', form=form)
 
 @app.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('index'))
+    return redirect(url_for('home'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('home'))
     form = RegistrationForm()
     if form.validate_on_submit():
         user = User(username=form.username.data, email=form.email.data)
@@ -113,4 +104,5 @@ def edit_profile():
         form.username.data = current_user.username
         form.about_me.data = current_user.about_me
     return render_template('edit_profile.html', title='Edit Profile', form=form)
+
 
