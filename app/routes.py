@@ -44,6 +44,7 @@ def get_year(year):
         listed = listed[:50]
         return render_template('accident_data.html', listed=listed, year=year)
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -101,6 +102,7 @@ def edit_profile():
         form.username.data = current_user.username
         form.about_me.data = current_user.about_me
     return render_template('edit_profile.html', title='Edit Profile', form=form)
+
 
 
 
