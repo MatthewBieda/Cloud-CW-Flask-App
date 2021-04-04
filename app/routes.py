@@ -26,14 +26,7 @@ def index():
             return "Please enter a year between 2006 and 2019"
 
     if request.method == 'GET':
-        user = {'username': 'Miguel'}
-        posts = [
-            {
-                'author': {'username': 'Matt'},
-                'body': 'Which year\'s accident data would you like to view?:'
-            }
-        ]
-        return render_template('index.html', title='Home', posts=posts)
+        return render_template('index.html', title='Home')
 
 @app.route('/<year>', methods=['GET'])
 def get_year(year):

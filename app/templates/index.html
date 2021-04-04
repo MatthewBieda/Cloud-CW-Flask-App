@@ -2,6 +2,7 @@
 
 {% block content %}
     <h1>Hi, {{ current_user.username }}!</h1>
+    <h2>Which year's accident data would you like to view?</h2>
     {% for post in posts %}
     <div><p><b>{{ post.body }}</b></p></div>
     {% endfor %}
