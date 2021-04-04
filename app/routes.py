@@ -8,8 +8,6 @@ from datetime import datetime
 import requests
 import json
 
-
-
 @app.before_request
 def before_request():
     if current_user.is_authenticated:
@@ -22,18 +20,7 @@ def before_request():
 def home():
     if request.method == 'POST':
         year = request.form.get('year')
-        if year > '2005':
-            data = requests.get(f"https://api.tfl.gov.uk/AccidentStats/{year}")
-            jsondata = data.text
-            new = 0
-            old = []
-            text_json = json.loads(jsondata)
-            for i in text_json:
-                old.append(text_json[new]["borough"])
-                new = new + 1
-            return json.dumps(old)
-        else:
-            print("Please enter a year between 2005 and 2020")
+        return redirect(f'/{year}')
 
     if request.method == 'GET':
         user = {'username': 'Miguel'}
@@ -45,7 +32,17 @@ def home():
         ]
         return render_template('home.html', title='Home', posts=posts)
 
+@app.route('/<year>', methods=['GET'])
+def get_year(year):
+    if current_user.is_authenticated:
+        data = requests.get(f"https://api.tfl.gov.uk/AccidentStats/{year}")
+        jsondata = data.json()
+        listed = []
 
+        for line in jsondata:
+            listed.append([line['date'], line['severity'], line['borough'], [x['type'] for x in line['vehicles']], len(line['casualties'])])
+        listed = listed[:50]
+        return render_template('accident_data.html', listed=listed, year=year)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -58,7 +55,7 @@ def login():
             flash('Invalid username or password')
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
-        return redirect(url_for('home'))
+        return redirect(url_for('index'))
     return render_template('login.html', title='Sign In', form=form)
 
 @app.route('/logout')
@@ -104,5 +101,8 @@ def edit_profile():
         form.username.data = current_user.username
         form.about_me.data = current_user.about_me
     return render_template('edit_profile.html', title='Edit Profile', form=form)
+
+
+
 
 
