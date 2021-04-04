@@ -20,9 +20,10 @@ def before_request():
 def index():
     if request.method == 'POST':
         year = request.form.get('year')
-        data = requests.get(f"https://api.tfl.gov.uk/AccidentStats/{year}")
-        jsondata = data.json()
-        return json.dumps(jsondata)
+        if year > '2005':
+            return redirect(f'/{year}')
+        else:
+            return "Please enter a year between 2006 and 2019"
 
     if request.method == 'GET':
         user = {'username': 'Miguel'}
@@ -33,6 +34,18 @@ def index():
             }
         ]
         return render_template('index.html', title='Home', posts=posts)
+
+@app.route('/<year>', methods=['GET'])
+def get_year(year):
+    if current_user.is_authenticated:
+        data = requests.get(f"https://api.tfl.gov.uk/AccidentStats/{year}")
+        jsondata = data.json()
+        listed = []
+
+        for line in jsondata:
+            listed.append([line['date'], line['severity'], line['borough'], [x['type'] for x in line['vehicles']], len(line['casualties'])])
+        listed = listed[:50]
+        return render_template('accident_data.html', listed=listed, year=year)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
