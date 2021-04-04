@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+
+{% block head %}
+<title>Accident Data for {{ year }}</title>
+{% endblock head %}
+
+{% block body%}
+<div class="content">
+    <h1>Accident Data for {{ Borough }}</h1>
+
+    <table id="table" class="center";>
+        <tr>
+            <th>Borough</th>
+
+        </tr>
+        {% for entry in accident_borough_stats %}
+        <tr>
+            <td>{{ entry[0] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+</div>
+{% endblock %}
